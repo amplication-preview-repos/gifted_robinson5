@@ -1,0 +1,115 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model Application {
+  amountApproved  Float?
+  amountRequested Float?
+  approvalDate    DateTime?
+  client          Client?                @relation(fields: [clientId], references: [id])
+  clientId        String?
+  createdAt       DateTime               @default(now())
+  id              String                 @id @default(cuid())
+  loans           Loan[]
+  status          EnumApplicationStatus?
+  updatedAt       DateTime               @updatedAt
+}
+
+model Client {
+  address      String?
+  applications Application[]
+  createdAt    DateTime      @default(now())
+  email        String?
+  firstName    String?
+  id           String        @id @default(cuid())
+  lastName     String?
+  loans        Loan[]
+  phoneNumber  String?
+  updatedAt    DateTime      @updatedAt
+}
+
+model EmailLog {
+  body      String?
+  createdAt DateTime            @default(now())
+  id        String              @id @default(cuid())
+  sentDate  DateTime?
+  status    EnumEmailLogStatus?
+  subject   String?
+  to        String?
+  updatedAt DateTime            @updatedAt
+}
+
+model SmsLog {
+  createdAt DateTime          @default(now())
+  id        String            @id @default(cuid())
+  message   String?
+  sentDate  DateTime?
+  status    EnumSmsLogStatus?
+  to        String?
+  updatedAt DateTime          @updatedAt
+}
+
+model Loan {
+  amount        Float?
+  application   Application?    @relation(fields: [applicationId], references: [id])
+  applicationId String?
+  client        Client?         @relation(fields: [clientId], references: [id])
+  clientId      String?
+  createdAt     DateTime        @default(now())
+  endDate       DateTime?
+  id            String          @id @default(cuid())
+  interestRate  Float?
+  payments      Payment[]
+  startDate     DateTime?
+  status        EnumLoanStatus?
+  updatedAt     DateTime        @updatedAt
+}
+
+model Payment {
+  amount      Float?
+  createdAt   DateTime                @default(now())
+  id          String                  @id @default(cuid())
+  loan        Loan?                   @relation(fields: [loanId], references: [id])
+  loanId      String?
+  loanBalance Float?
+  paymentDate DateTime?
+  paymentType EnumPaymentPaymentType?
+  updatedAt   DateTime                @updatedAt
+}
+
+enum EnumApplicationStatus {
+  Option1
+}
+
+enum EnumEmailLogStatus {
+  Option1
+}
+
+enum EnumSmsLogStatus {
+  Option1
+}
+
+enum EnumLoanStatus {
+  Option1
+}
+
+enum EnumPaymentPaymentType {
+  Option1
+}
